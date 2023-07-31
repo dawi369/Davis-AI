@@ -1,5 +1,3 @@
-import hashlib
-import time
 from CONSTANTS import *
 import pyaudio
 import websockets
