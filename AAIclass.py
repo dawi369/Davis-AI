@@ -25,78 +25,81 @@ URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
 # SETUP ASSEMBLYAI
 class AAIclass:
 
-    def __init__(self):
-        self.send_result = ""
-        self.receive_result = ""
+	def __init__(self):
+		self.send_result = ""
+		self.receive_result = ""
 
-    @staticmethod
-    async def send_receive():
-        print(f'Connecting websocket to url ${URL}')
+	@staticmethod
+	async def send_receive():
+		print(f'Connecting websocket to url ${URL}')
 
-        async with websockets.connect(
-                URL,
-                extra_headers=(("Authorization", AAIAPIKEY),),
-                ping_interval=5,
-                ping_timeout=20
-        ) as _ws:
+		async with websockets.connect(
+				URL,
+				extra_headers=(("Authorization", AAIAPIKEY),),
+				ping_interval=5,
+				ping_timeout=20
+		) as _ws:
 
-            await asyncio.sleep(0.1)
-            print("Receiving Session Begins ...")
+			await asyncio.sleep(0.1)
+			print("Receiving Session Begins ...")
 
-            session_begins = await _ws.recv()
-            print(session_begins)
-            print("Sending messages ...")
+			session_begins = await _ws.recv()
+			print(session_begins)
+			print("Sending messages ...")
 
-            async def send():
-                while True:
-                    try:
-                        data = stream.read(FRAMES_PER_BUFFER)
-                        data = base64.b64encode(data).decode("utf-8")
-                        json_data = json.dumps({"audio_data": str(data)})
-                        await _ws.send(json_data)
+			async def send():
+				while True:
+					try:
+						data = stream.read(FRAMES_PER_BUFFER)
+						data = base64.b64encode(data).decode("utf-8")
+						json_data = json.dumps({"audio_data": str(data)})
+						await _ws.send(json_data)
 
-                    except websockets.ConnectionClosedError as e:
+					except websockets.ConnectionClosedError as e:
 
-                        print(e)
-                        assert e.code == 4008
-                        break
+						print(e)
+						assert e.code == 4008
+						break
 
-                    except Exception as e:
-                        assert False, "Not a websocket 4008 error"
+					except Exception as e:
+						assert False, "Not a websocket 4008 error"
 
-                    await asyncio.sleep(0.01)
+					await asyncio.sleep(0.01)
 
-                return True
+				return True
 
-            async def receive():
-                while True:
-                    try:
-                        result_str = await _ws.recv()
-                        if json.loads(result_str)['message_type'] == 'FinalTranscript':
-                            currentText = json.loads(result_str)['text']
-                            print(currentText)
+			async def receive():
+				while True:
+					try:
+						result_str = await _ws.recv()
+						if json.loads(result_str)['message_type'] == 'FinalTranscript':
+							currentText = json.loads(result_str)['text']
+							print(currentText)
 
-                            with open('commands.txt', 'a') as f:
-                                if currentText != '':
-                                    f.write(currentText + '\n')
+							with open('commands.txt', 'a') as f:
+								if currentText != '':
+									f.write(currentText + '\n')
 
-                            if 'quit' in currentText or 'Quit' in 'currentText' or 'quit.' in currentText or 'Quit.' in currentText:
-                                print('Quitting')
+							if 'quit' in currentText or 'Quit' in 'currentText' or 'quit.' in currentText or 'Quit.' in currentText:
+								print('Quitting')
 
-                                with open('commands.txt', 'w'):
-                                    pass
+								with open('commands.txt', 'w'):
+									pass
 
-                                raise Exception('Quit')
+								with open('chat_answers.txt', 'w'):
+									pass
 
-                    except websockets.ConnectionClosedError as e:
-                        print(e)
-                        assert e.code == 4008
-                        break
+								raise Exception('Quit')
 
-                    except Exception as e:
-                        assert False, "Not a websocket 4008 error"
+					except websockets.ConnectionClosedError as e:
+						print(e)
+						assert e.code == 4008
+						break
 
-            send_result, receive_result = await asyncio.gather(send(), receive())
+					except Exception as e:
+						assert False, "Not a websocket 4008 error"
 
-    while True:
-        asyncio.run(send_receive())
+			send_result, receive_result = await asyncio.gather(send(), receive())
+
+	while True:
+		asyncio.run(send_receive())
