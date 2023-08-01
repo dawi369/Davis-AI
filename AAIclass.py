@@ -4,6 +4,7 @@ import websockets
 import asyncio
 import json
 import base64
+from FLAGS import listening
 
 # SETUP
 FRAMES_PER_BUFFER = 3200
@@ -73,23 +74,24 @@ class AAIclass:
 					try:
 						result_str = await _ws.recv()
 						if json.loads(result_str)['message_type'] == 'FinalTranscript':
-							currentText = json.loads(result_str)['text']
-							print(currentText)
+							if listening:
+								currentText = json.loads(result_str)['text']
+								print(currentText)
 
-							with open('commands.txt', 'a') as f:
-								if currentText != '':
-									f.write(currentText + '\n')
+								with open('commands.txt', 'a') as f:
+									if currentText != '':
+										f.write(currentText + '\n')
 
-							if 'quit' in currentText or 'Quit' in 'currentText' or 'quit.' in currentText or 'Quit.' in currentText:
-								print('Quitting')
+								if 'quit' in currentText or 'Quit' in 'currentText' or 'quit.' in currentText or 'Quit.' in currentText:
+									print('Quitting')
 
-								with open('commands.txt', 'w'):
-									pass
+									with open('commands.txt', 'w'):
+										pass
 
-								with open('chat_answers.txt', 'w'):
-									pass
+									with open('chat_answers.txt', 'w'):
+										pass
 
-								raise Exception('Quit')
+									raise Exception('Quit')
 
 					except websockets.ConnectionClosedError as e:
 						print(e)

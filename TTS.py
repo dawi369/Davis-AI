@@ -5,12 +5,27 @@ from watchdog.events import FileSystemEventHandler
 import queue
 import time
 
+import FLAGS
+
 # SETUP
 chatPath = 'chat_answers.txt'
 directoryPath = 'C:\\Gen Projects\\Davis'
 
 engine = pyttsx3.init()
 text_queue = queue.Queue()
+
+
+def startedSpeaking():
+	FLAGS.listening = False
+	time.sleep(1)
+
+def stoppedSpeaking():
+	FLAGS.listening = True
+	time.sleep(1)
+
+# Connect the custom functions to the events
+engine.connect('start-utterance', startedSpeaking)
+engine.connect('end-utterance', stoppedSpeaking)
 
 
 class FileChangeHandler(FileSystemEventHandler):
@@ -61,6 +76,7 @@ try:
 			text = text_queue.get_nowait()
 			# Speak the text
 			engine.say(text)
+			time.sleep(0.2)
 			engine.runAndWait()
 		except queue.Empty:
 			# No text in the queue, continue waiting
