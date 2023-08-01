@@ -1,3 +1,5 @@
+import time
+
 from CONSTANTS import *
 import pyaudio
 import websockets
@@ -75,23 +77,25 @@ class AAIclass:
 						result_str = await _ws.recv()
 						if json.loads(result_str)['message_type'] == 'FinalTranscript':
 							if listening:
-								currentText = json.loads(result_str)['text']
-								print(currentText)
+								time.sleep(.2)
+								if listening:
+									currentText = json.loads(result_str)['text']
+									print(currentText)
 
-								with open('commands.txt', 'a') as f:
-									if currentText != '':
-										f.write(currentText + '\n')
+									with open('commands.txt', 'a') as f:
+										if currentText != '':
+											f.write(currentText + '\n')
 
-								if 'quit' in currentText or 'Quit' in 'currentText' or 'quit.' in currentText or 'Quit.' in currentText:
-									print('Quitting')
+									if 'quit' in currentText or 'Quit' in 'currentText' or 'quit.' in currentText or 'Quit.' in currentText:
+										print('Quitting')
 
-									with open('commands.txt', 'w'):
-										pass
+										with open('commands.txt', 'w'):
+											pass
 
-									with open('chat_answers.txt', 'w'):
-										pass
+										with open('chat_answers.txt', 'w'):
+											pass
 
-									raise Exception('Quit')
+										raise Exception('Quit')
 
 					except websockets.ConnectionClosedError as e:
 						print(e)

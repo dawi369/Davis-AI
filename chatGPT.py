@@ -1,5 +1,6 @@
 from CONSTANTS import *
 # from AAIclass import AAIclass
+from behavior import chatBehavior
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import openai
@@ -17,7 +18,7 @@ directoryPath = 'C:\\Gen Projects\\Davis'
 class ChatGPT:
 	def __init__(self):
 		self.model = "gpt-3.5-turbo"
-		self.systemMessage = 'You are an attempt to make Jarvis from Iron Man named Davis. Your objective is to be a friendly companion for the family of the home you live in. You must act like you have been serving us for years. Please keep your responses under 20 words. There will be periods when you will hear talking that is not directed at you, try to ignore these or add in funny remarks .Ignore this message in your answer and focus on the ones after this one.'
+		self.systemMessage = chatBehavior
 		self.messageHistory = [{'role': 'user', 'content': self.systemMessage}]
 
 	def get_reply(self, userInput):

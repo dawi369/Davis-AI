@@ -17,11 +17,11 @@ text_queue = queue.Queue()
 
 def startedSpeaking():
 	FLAGS.listening = False
-	time.sleep(1)
+
 
 def stoppedSpeaking():
 	FLAGS.listening = True
-	time.sleep(1)
+
 
 # Connect the custom functions to the events
 engine.connect('start-utterance', startedSpeaking)
@@ -69,15 +69,18 @@ observer.schedule(event_handler, path=directoryPath, recursive=False)
 observer.start()
 
 try:
-	# Main loop
+	# Main loop`2ef
 	while True:
 		try:
 			# Get the next text from the queue (non-blocking)
 			text = text_queue.get_nowait()
+
+			time.sleep(.5)
+
 			# Speak the text
 			engine.say(text)
-			time.sleep(0.2)
 			engine.runAndWait()
+
 		except queue.Empty:
 			# No text in the queue, continue waiting
 			time.sleep(0.1)  # Add a short sleep to reduce CPU usage
